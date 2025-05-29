@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}实战项目 - Python 90天学习系统{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-6 fw-bold text-primary mb-2">🎯 实战项目</h1>
+        <p class="text-muted">13个循序渐进的项目，让您在实践中掌握Python</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for week, project in projects.items() %}
+    <div class="col-lg-6 col-xl-4 mb-4">
+        <div class="card border-0 shadow-sm h-100 project-card {{ project.status }}">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="project-icon me-3">
+                        {% if project.status == 'completed' %}
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        {% elif project.status == 'current' %}
+                            <i class="bi bi-play-circle-fill text-primary"></i>
+                        {% else %}
+                            <i class="bi bi-lock-fill text-muted"></i>
+                        {% endif %}
+                    </div>
+                    <h6 class="card-title mb-0">第{{ week }}周项目</h6>
+                </div>
+                <span class="badge {{ 'bg-primary' if project.level == '初级' else 'bg-success' if project.level == '中级' else 'bg-warning' }}">
+                    {{ project.level }}
+                </span>
+            </div>
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">{{ project.name }}</h5>
+                <p class="text-muted mb-4">{{ project.description }}</p>
+                
+                {% if project.status == 'completed' %}
+                    <div class="d-grid">
+                        <button class="btn btn-success" disabled>
+                            <i class="bi bi-check-circle me-2"></i>已完成
+                        </button>
+                    </div>
+                {% elif project.status == 'current' %}
+                    <div class="d-grid">
+                        <button class="btn btn-primary">
+                            <i class="bi bi-code-slash me-2"></i>开始项目
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="d-grid">
+                        <button class="btn btn-outline-secondary" disabled>
+                            <i class="bi bi-lock me-2"></i>尚未解锁
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if project.status != 'locked' %}
+            <div class="card-footer bg-light border-0">
+                <small class="text-muted">
+                    <i class="bi bi-calendar me-1"></i>
+                    建议完成时间：周末
+                </small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.project-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.project-card.locked {
+    opacity: 0.6;
+}
+
+.project-icon {
+    font-size: 1.5rem;
+}
+</style>
+{% endblock %} 

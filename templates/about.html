@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}关于系统 - Python 90天学习系统{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-primary mb-3">🐍 Python 90天学习系统</h1>
+    <p class="lead text-muted">专为Python初学者设计的系统化学习平台</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-body p-5">
+                <h4 class="fw-bold text-primary mb-4">🎯 系统简介</h4>
+                <p class="mb-4">
+                    Python 90天学习系统是一个专门为Python初学者设计的在线学习平台。
+                    通过科学的课程安排和循序渐进的学习路径，帮助学习者在90天内从零基础成长为能够独立开发项目的Python开发者。
+                </p>
+                
+                <h5 class="fw-bold text-success mb-3">✨ 核心特色</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                90天系统化学习计划
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                三个学习阶段循序渐进
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                13个实战项目巩固知识
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                详细的学习进度跟踪
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                个人学习笔记系统
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                现代化响应式界面
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h5 class="fw-bold text-info mb-3">📚 学习内容</h5>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="bi bi-play-circle text-primary" style="font-size: 2rem;"></i>
+                            <h6 class="fw-bold mt-2">初级阶段</h6>
+                            <small class="text-muted">第1-30天</small>
+                            <p class="small mt-2">Python基础语法、数据类型、控制结构、函数等核心概念</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="bi bi-gear text-success" style="font-size: 2rem;"></i>
+                            <h6 class="fw-bold mt-2">中级阶段</h6>
+                            <small class="text-muted">第31-60天</small>
+                            <p class="small mt-2">面向对象编程、常用库、文件操作、异常处理等进阶内容</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <i class="bi bi-rocket text-warning" style="font-size: 2rem;"></i>
+                            <h6 class="fw-bold mt-2">高级阶段</h6>
+                            <small class="text-muted">第61-90天</small>
+                            <p class="small mt-2">Web开发、数据科学、机器学习、项目部署等专业应用</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h5 class="fw-bold text-warning mb-3">🛠️ 技术架构</h5>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">前端技术</h6>
+                        <ul class="list-unstyled small">
+                            <li>• Bootstrap 5.3 响应式框架</li>
+                            <li>• Bootstrap Icons 图标库</li>
+                            <li>• 原生JavaScript交互</li>
+                            <li>• Jinja2模板引擎</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">后端技术</h6>
+                        <ul class="list-unstyled small">
+                            <li>• Python 3.8+ 编程语言</li>
+                            <li>• Flask 轻量级Web框架</li>
+                            <li>• JSON文件数据存储</li>
+                            <li>• RESTful API设计</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h5 class="fw-bold text-danger mb-3">🎯 学习目标</h5>
+                <div class="alert alert-light border">
+                    <p class="mb-2">完成90天学习后，您将能够：</p>
+                    <ul class="mb-0">
+                        <li>熟练掌握Python核心语法和编程思维</li>
+                        <li>独立开发简单到中等复杂度的Python应用</li>
+                        <li>理解面向对象编程和常用设计模式</li>
+                        <li>具备使用Python进行数据分析和Web开发的能力</li>
+                        <li>拥有13个完整项目的实战经验</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-3">
+                <i class="bi bi-house me-2"></i>返回首页
+            </a>
+            <a href="{{ url_for('curriculum') }}" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-book me-2"></i>开始学习
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

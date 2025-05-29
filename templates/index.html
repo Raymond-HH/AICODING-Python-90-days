@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - Python 90天学习系统{% endblock %}
+
+{% block content %}
+<!-- 欢迎横幅 -->
+<div class="hero-section text-white rounded-4 p-5 mb-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 400px;">
+    <!-- 背景装饰图标 -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="opacity: 0.05; z-index: 1;">
+        <div class="d-flex justify-content-between align-items-center h-100 px-5">
+            <i class="bi bi-code-slash" style="font-size: 6rem; color: white;"></i>
+            <i class="bi bi-laptop" style="font-size: 6rem; color: white;"></i>
+            <i class="bi bi-graph-up" style="font-size: 6rem; color: white;"></i>
+        </div>
+    </div>
+    
+    <!-- 主要内容 -->
+    <div class="position-relative" style="z-index: 10;">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold mb-3" style="color: white; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">
+                    🐍 欢迎来到Python学习之旅！
+                </h1>
+                <p class="lead mb-4" style="color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.4); font-size: 1.1rem;">
+                    90天系统化学习计划，从零基础到能够独立开发项目。<br>
+                    每天1-2小时，循序渐进，让编程成为你的超能力！
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <a href="{{ url_for('course_day', day=stats.current_day) }}" class="btn btn-light btn-lg shadow-sm">
+                        <i class="bi bi-play-circle me-2"></i>
+                        开始第{{ stats.current_day }}天学习
+                    </a>
+                    <a href="{{ url_for('curriculum') }}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-book me-2"></i>
+                        查看课程大纲
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center">
+                <div class="progress-circle-container d-flex justify-content-center">
+                    <div class="progress-circle" style="background: rgba(255,255,255,0.1); border-radius: 50%; padding: 20px; backdrop-filter: blur(10px);">
+                        <svg width="180" height="180" viewBox="0 0 180 180">
+                            <circle cx="90" cy="90" r="70" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="6"/>
+                            <circle cx="90" cy="90" r="70" fill="none" stroke="white" stroke-width="6" 
+                                    stroke-dasharray="{{ 439.6 * stats.completion_rate / 100 }} 439.6" 
+                                    stroke-dashoffset="0" 
+                                    transform="rotate(-90 90 90)"
+                                    style="transition: stroke-dasharray 1s ease-in-out;"/>
+                            <text x="90" y="85" text-anchor="middle" dy="7" fill="white" font-size="22" font-weight="bold">
+                                {{ "%.0f"|format(stats.completion_rate) }}%
+                            </text>
+                            <text x="90" y="105" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="12">
+                                学习进度
+                            </text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <small class="text-light" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                        已完成 {{ stats.completed_days }} / 90 天
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 快速统计 -->
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-primary mb-3">
+                    <i class="bi bi-calendar-check" style="font-size: 2.5rem;"></i>
+                </div>
+                <h3 class="card-title">{{ stats.completed_days }}</h3>
+                <p class="text-muted mb-0">已完成天数</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-success mb-3">
+                    <i class="bi bi-trophy" style="font-size: 2.5rem;"></i>
+                </div>
+                <h3 class="card-title">{{ stats.current_day }}</h3>
+                <p class="text-muted mb-0">当前第几天</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-warning mb-3">
+                    <i class="bi bi-clock" style="font-size: 2.5rem;"></i>
+                </div>
+                <h3 class="card-title">{{ stats.remaining_days }}</h3>
+                <p class="text-muted mb-0">剩余天数</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="text-info mb-3">
+                    <i class="bi bi-journal-text" style="font-size: 2.5rem;"></i>
+                </div>
+                <h3 class="card-title">{{ progress.notes|length }}</h3>
+                <p class="text-muted mb-0">学习笔记</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 学习路径 -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pb-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-map me-2"></i>学习路径
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="learning-phase text-center p-3 rounded {{ 'phase-active' if stats.current_day <= 30 else 'phase-completed' if stats.current_day > 30 else '' }}">
+                            <div class="phase-icon mb-3">
+                                <i class="bi bi-play-circle" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6 class="fw-bold">初级阶段</h6>
+                            <p class="small text-muted">第1-30天</p>
+                            <p class="small">Python基础语法、数据类型、控制结构</p>
+                            <div class="progress" style="height: 6px;">
+                                {% set beginner_progress = (stats.completed_days if stats.completed_days <= 30 else 30) / 30 * 100 %}
+                                <div class="progress-bar bg-primary" style="width: {{ beginner_progress }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="learning-phase text-center p-3 rounded {{ 'phase-active' if 30 < stats.current_day <= 60 else 'phase-completed' if stats.current_day > 60 else 'phase-locked' }}">
+                            <div class="phase-icon mb-3">
+                                <i class="bi bi-gear" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6 class="fw-bold">中级阶段</h6>
+                            <p class="small text-muted">第31-60天</p>
+                            <p class="small">面向对象编程、常用库、项目开发</p>
+                            <div class="progress" style="height: 6px;">
+                                {% set intermediate_progress = ((stats.completed_days - 30) if stats.completed_days > 30 else 0) %}
+                                {% set intermediate_progress = (intermediate_progress if intermediate_progress <= 30 else 30) / 30 * 100 %}
+                                <div class="progress-bar bg-success" style="width: {{ intermediate_progress }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="learning-phase text-center p-3 rounded {{ 'phase-active' if stats.current_day > 60 else 'phase-locked' }}">
+                            <div class="phase-icon mb-3">
+                                <i class="bi bi-rocket" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6 class="fw-bold">高级阶段</h6>
+                            <p class="small text-muted">第61-90天</p>
+                            <p class="small">高级特性、框架应用、项目部署</p>
+                            <div class="progress" style="height: 6px;">
+                                {% set advanced_progress = ((stats.completed_days - 60) if stats.completed_days > 60 else 0) %}
+                                {% set advanced_progress = (advanced_progress if advanced_progress <= 30 else 30) / 30 * 100 %}
+                                <div class="progress-bar bg-warning" style="width: {{ advanced_progress }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pb-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightning me-2"></i>快速开始
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('course_day', day=stats.current_day) }}" class="btn btn-primary">
+                        <i class="bi bi-book-open me-2"></i>
+                        今日学习内容
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-speedometer2 me-2"></i>
+                        学习仪表板
+                    </a>
+                    <a href="{{ url_for('projects') }}" class="btn btn-outline-success">
+                        <i class="bi bi-folder me-2"></i>
+                        实战项目
+                    </a>
+                    <a href="{{ url_for('notes') }}" class="btn btn-outline-info">
+                        <i class="bi bi-journal-text me-2"></i>
+                        我的笔记
+                    </a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="small text-muted mb-2">今日学习提醒</p>
+                    <p class="small">
+                        <i class="bi bi-clock me-1"></i>
+                        建议学习时间：1-2小时
+                    </p>
+                    <p class="small">
+                        <i class="bi bi-target me-1"></i>
+                        坚持每天学习，养成编程习惯
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 学习提示 -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm bg-light">
+            <div class="card-body">
+                <h6 class="card-title">💡 学习小贴士</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled small">
+                            <li><i class="bi bi-check-circle text-success me-2"></i>每天坚持学习1-2小时</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>理论结合实践，多动手写代码</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>遇到问题要善于思考和查资料</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled small">
+                            <li><i class="bi bi-check-circle text-success me-2"></i>做好学习笔记，记录重点和疑问</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>完成每周项目，巩固所学知识</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>与他人交流分享，共同进步</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 英雄区域增强样式 */
+.hero-section {
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    position: relative;
+}
+
+.hero-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%);
+    z-index: 2;
+}
+
+/* 进度圆环浮动动画 */
+.progress-circle-container {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.progress-circle {
+    transition: all 0.3s ease;
+}
+
+.progress-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+}
+
+/* 学习阶段卡片样式 */
+.learning-phase {
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.learning-phase::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s ease;
+    z-index: 1;
+}
+
+.learning-phase:hover::before {
+    left: 100%;
+}
+
+.learning-phase > * {
+    position: relative;
+    z-index: 2;
+}
+
+.phase-active {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,123,255,0.3);
+    border-color: #007bff;
+}
+
+.phase-active .text-muted {
+    color: rgba(255,255,255,0.8) !important;
+}
+
+.phase-completed {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+    border-color: #28a745;
+}
+
+.phase-completed .text-muted {
+    color: rgba(255,255,255,0.8) !important;
+}
+
+.phase-locked {
+    background: #f8f9fa;
+    color: #6c757d;
+    opacity: 0.7;
+}
+
+/* 按钮增强效果 */
+.btn-light {
+    background: rgba(255,255,255,0.95);
+    border: none;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.btn-outline-light {
+    border: 2px solid rgba(255,255,255,0.8);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: white;
+    transform: translateY(-2px);
+}
+
+/* 卡片悬停效果 */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+
+/* 统计卡片图标动画 */
+.card .text-primary,
+.card .text-success,
+.card .text-warning,
+.card .text-info {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .text-primary,
+.card:hover .text-success,
+.card:hover .text-warning,
+.card:hover .text-info {
+    transform: scale(1.1);
+}
+
+/* 进度条动画 */
+.progress-bar {
+    animation: progressAnimation 1.5s ease-out;
+}
+
+@keyframes progressAnimation {
+    from { width: 0% !important; }
+}
+
+/* 背景装饰图标动画 */
+.hero-section .position-absolute i {
+    animation: iconFloat 6s ease-in-out infinite;
+}
+
+.hero-section .position-absolute i:nth-child(2) {
+    animation-delay: 2s;
+}
+
+.hero-section .position-absolute i:nth-child(3) {
+    animation-delay: 4s;
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-15px) rotate(3deg); }
+    66% { transform: translateY(-5px) rotate(-2deg); }
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 350px !important;
+        padding: 2rem !important;
+    }
+    
+    .display-4 {
+        font-size: 1.8rem !important;
+    }
+    
+    .progress-circle-container svg {
+        width: 150px !important;
+        height: 150px !important;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .hero-section .position-absolute {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-lg-7, .col-lg-5 {
+        text-align: center !important;
+    }
+    
+    .d-flex.flex-wrap {
+        justify-content: center !important;
+    }
+}
+</style>
+{% endblock %} 

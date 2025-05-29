@@ -1,0 +1,15 @@
+{
+  "start_date": "2025-05-29",
+  "current_day": 3,
+  "completed_days": [
+    1,
+    2
+  ],
+  "notes": {
+    "1": {
+      "content": "1",
+      "date": "2025-05-29 23:22:36"
+    }
+  },
+  "weekly_projects": {}
+}

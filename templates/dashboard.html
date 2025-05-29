@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}学习仪表板 - Python 90天学习系统{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-6 fw-bold text-primary mb-2">📊 学习仪表板</h1>
+        <p class="text-muted">全面了解您的学习进度和成果</p>
+    </div>
+</div>
+
+<!-- 核心指标 -->
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-center">
+            <div class="card-body">
+                <div class="metric-icon text-primary mb-3">
+                    <i class="bi bi-trophy" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="fw-bold text-primary">{{ stats.completed_days }}</h3>
+                <p class="text-muted mb-0">已完成天数</p>
+                <small class="text-success">
+                    <i class="bi bi-arrow-up"></i>
+                    {{ "%.1f"|format(stats.completion_rate) }}% 总进度
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-center">
+            <div class="card-body">
+                <div class="metric-icon text-success mb-3">
+                    <i class="bi bi-calendar-check" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="fw-bold text-success">{{ stats.current_day }}</h3>
+                <p class="text-muted mb-0">当前学习天</p>
+                <small class="text-info">
+                    <i class="bi bi-clock"></i>
+                    今日任务待完成
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-center">
+            <div class="card-body">
+                <div class="metric-icon text-warning mb-3">
+                    <i class="bi bi-hourglass-split" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="fw-bold text-warning">{{ stats.remaining_days }}</h3>
+                <p class="text-muted mb-0">剩余天数</p>
+                <small class="text-muted">
+                    <i class="bi bi-calendar3"></i>
+                    距离完成目标
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 text-center">
+            <div class="card-body">
+                <div class="metric-icon text-info mb-3">
+                    <i class="bi bi-journal-text" style="font-size: 3rem;"></i>
+                </div>
+                <h3 class="fw-bold text-info">{{ notes|length }}</h3>
+                <p class="text-muted mb-0">学习笔记</p>
+                <small class="text-muted">
+                    <i class="bi bi-pencil"></i>
+                    记录学习心得
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 学习进度可视化 -->
+<div class="row mb-5">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>学习进度趋势
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="progress-overview mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold">总体进度</span>
+                        <span class="fw-bold text-primary">{{ "%.1f"|format(stats.completion_rate) }}%</span>
+                    </div>
+                    <div class="progress" style="height: 12px;">
+                        <div class="progress-bar" 
+                             style="width: {{ stats.completion_rate }}%; background: linear-gradient(90deg, #007bff, #28a745);"></div>
+                    </div>
+                </div>
+                
+                <!-- 阶段性进度 -->
+                <div class="stages-progress">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="stage-card">
+                                <h6 class="fw-bold text-primary mb-2">初级阶段</h6>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    {% set beginner_progress = ((stats.completed_days if stats.completed_days <= 30 else 30) / 30 * 100) %}
+                                    <div class="progress-bar bg-primary" style="width: {{ beginner_progress }}%"></div>
+                                </div>
+                                <small class="text-muted">第1-30天</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stage-card">
+                                <h6 class="fw-bold text-success mb-2">中级阶段</h6>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    {% set intermediate_progress = (((stats.completed_days - 30) if stats.completed_days > 30 else 0) / 30 * 100) %}
+                                    {% set intermediate_progress = (intermediate_progress if intermediate_progress <= 100 else 100) %}
+                                    <div class="progress-bar bg-success" style="width: {{ intermediate_progress }}%"></div>
+                                </div>
+                                <small class="text-muted">第31-60天</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stage-card">
+                                <h6 class="fw-bold text-warning mb-2">高级阶段</h6>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    {% set advanced_progress = (((stats.completed_days - 60) if stats.completed_days > 60 else 0) / 30 * 100) %}
+                                    {% set advanced_progress = (advanced_progress if advanced_progress <= 100 else 100) %}
+                                    <div class="progress-bar bg-warning" style="width: {{ advanced_progress }}%"></div>
+                                </div>
+                                <small class="text-muted">第61-90天</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-target me-2"></i>今日目标
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="today-progress-circle mx-auto mb-3">
+                        <div class="circle-progress" data-progress="0">
+                            <svg width="120" height="120" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="8"/>
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#007bff" stroke-width="8" 
+                                        stroke-dasharray="314.16" stroke-dashoffset="314.16" 
+                                        transform="rotate(-90 60 60)" class="progress-circle"/>
+                                <text x="60" y="65" text-anchor="middle" font-size="20" font-weight="bold" fill="#007bff">
+                                    0%
+                                </text>
+                            </svg>
+                        </div>
+                    </div>
+                    <h6 class="fw-bold">第{{ stats.current_day }}天学习任务</h6>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('course_day', day=stats.current_day) }}" class="btn btn-primary">
+                        <i class="bi bi-book-open me-2"></i>开始今日学习
+                    </a>
+                    <button class="btn btn-outline-success" onclick="markTodayComplete()">
+                        <i class="bi bi-check-circle me-2"></i>标记今日完成
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 最近笔记 -->
+{% if notes %}
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-journal-text me-2"></i>最近学习笔记
+                </h5>
+                <a href="{{ url_for('notes') }}" class="btn btn-outline-primary btn-sm">
+                    查看全部笔记
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for day, note in notes.items() %}
+                    <div class="col-md-6 mb-3">
+                        <div class="note-card p-3 border rounded">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold text-primary mb-0">第{{ day }}天</h6>
+                                <small class="text-muted">{{ note.date }}</small>
+                            </div>
+                            <p class="text-muted small mb-0">{{ note.content[:100] }}{% if note.content|length > 100 %}...{% endif %}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.metric-icon {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stage-card {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.today-progress-circle {
+    width: 120px;
+    height: 120px;
+}
+
+.progress-circle {
+    transition: stroke-dashoffset 1s ease-in-out;
+}
+
+.note-card {
+    background: #f8f9fa;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.note-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.progress-overview .progress-bar {
+    transition: width 1.5s ease-in-out;
+}
+
+.stages-progress .progress-bar {
+    transition: width 1s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.card:nth-child(4) {
+    animation-delay: 0.3s;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function markTodayComplete() {
+    var currentDay = {{ stats.current_day }};
+    fetch('/api/complete_day/' + currentDay, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            updateTodayProgress(100);
+            showSuccessMessage(data.message);
+            setTimeout(function() {
+                location.reload();
+            }, 2000);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        alert('操作失败，请重试');
+    });
+}
+
+function updateTodayProgress(progress) {
+    var circle = document.querySelector('.progress-circle');
+    var text = circle.nextElementSibling;
+    var circumference = 314.16;
+    var offset = circumference - (progress / 100) * circumference;
+    
+    circle.style.strokeDashoffset = offset;
+    text.textContent = progress + '%';
+    
+    if (progress === 100) {
+        circle.style.stroke = '#28a745';
+        text.style.fill = '#28a745';
+    }
+}
+
+function showSuccessMessage(message) {
+    var alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alert.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+    document.body.appendChild(alert);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(function(bar) {
+            var width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(function() {
+                bar.style.width = width;
+            }, 100);
+        });
+    }, 500);
+    
+    // 检查今日是否已完成
+    // 暂时简化，不使用复杂的数据检查
+});
+</script>
+{% endblock %} 

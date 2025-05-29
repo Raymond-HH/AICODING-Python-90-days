@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}第{{ day }}天 - {{ content.topic }}{% endblock %}
+
+{% block content %}
+<!-- 课程头部 -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('curriculum') }}">课程大纲</a></li>
+                <li class="breadcrumb-item active">第{{ day }}天</li>
+            </ol>
+        </nav>
+        
+        <div class="d-flex align-items-center mb-3">
+            <span class="badge bg-primary fs-6 me-3">第{{ day }}天</span>
+            {% if is_completed %}
+                <span class="badge bg-success fs-6 me-3">
+                    <i class="bi bi-check-circle me-1"></i>已完成
+                </span>
+            {% endif %}
+        </div>
+        
+        <h1 class="display-6 fw-bold text-primary mb-3">{{ content.topic }}</h1>
+        
+        <div class="row g-3 mb-4">
+            <div class="col-auto">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-clock text-muted me-2"></i>
+                    <span class="text-muted">{{ content.duration }}</span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-target text-muted me-2"></i>
+                    <span class="text-muted">{{ content.objectives }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 text-lg-end">
+        {% if not is_completed %}
+            <button class="btn btn-success btn-lg" onclick="completeDay({{ day }})">
+                <i class="bi bi-check-circle me-2"></i>
+                标记为完成
+            </button>
+        {% else %}
+            <button class="btn btn-outline-success btn-lg" disabled>
+                <i class="bi bi-check-circle me-2"></i>
+                已完成
+            </button>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- 核心概念 -->
+        {% if content.concepts %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-gradient text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>核心概念
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for concept in content.concepts %}
+                <div class="concept-item mb-4">
+                    <h6 class="fw-bold text-primary">{{ concept.name }}</h6>
+                    <p class="text-muted mb-3">{{ concept.description }}</p>
+                    
+                    {% if concept.details %}
+                    <ul class="list-group list-group-flush">
+                        {% for detail in concept.details %}
+                        <li class="list-group-item border-0 py-2">
+                            <i class="bi bi-arrow-right text-primary me-2"></i>{{ detail }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% if not loop.last %}<hr>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 代码示例 -->
+        {% if content.examples %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-code-square me-2"></i>代码示例
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for example in content.examples %}
+                <div class="example-item mb-4">
+                    <h6 class="fw-bold text-info mb-3">
+                        <i class="bi bi-play-circle me-2"></i>{{ example.title }}
+                    </h6>
+                    
+                    <div class="code-container">
+                        <div class="code-header d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">Python</span>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyCode(this)">
+                                <i class="bi bi-clipboard me-1"></i>复制
+                            </button>
+                        </div>
+                        <pre><code class="language-python">{{ example.code }}</code></pre>
+                    </div>
+                    
+                    <div class="explanation-box mt-3">
+                        <h6 class="small fw-bold text-success">
+                            <i class="bi bi-chat-dots me-1"></i>说明：
+                        </h6>
+                        <p class="small text-muted mb-0">{{ example.explanation }}</p>
+                    </div>
+                </div>
+                {% if not loop.last %}<hr>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 练习题 -->
+        {% if content.exercises %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-pencil-square me-2"></i>练习题
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for exercise in content.exercises %}
+                <div class="exercise-item mb-4">
+                    <div class="d-flex align-items-start">
+                        <span class="badge bg-warning text-dark fs-6 me-3">练习{{ loop.index }}</span>
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold text-warning">{{ exercise.title }}</h6>
+                            <p class="mb-3">{{ exercise.description }}</p>
+                            
+                            {% if exercise.hint %}
+                            <div class="hint-box">
+                                <h6 class="small fw-bold text-info">
+                                    <i class="bi bi-lightbulb me-1"></i>提示：
+                                </h6>
+                                <p class="small text-muted">{{ exercise.hint }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mt-3">
+                                <button class="btn btn-outline-success btn-sm" 
+                                        onclick="toggleSolution({{ loop.index }})">
+                                    <i class="bi bi-eye me-1"></i>查看答案
+                                </button>
+                            </div>
+                            
+                            <div id="solution-{{ loop.index }}" class="solution-box mt-3" style="display: none;">
+                                <h6 class="small fw-bold text-success">
+                                    <i class="bi bi-check-circle me-1"></i>参考答案：
+                                </h6>
+                                <div class="code-container">
+                                    <pre><code class="language-python">{{ exercise.solution }}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if not loop.last %}<hr>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 学习资源 -->
+        {% if content.resources %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-link-45deg me-2"></i>学习资源
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for resource in content.resources %}
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-globe text-primary me-3"></i>
+                    <a href="{{ resource }}" target="_blank" class="text-decoration-none">{{ resource }}</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- 侧边栏 -->
+    <div class="col-lg-4">
+        <!-- 学习笔记 -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-journal-text me-2"></i>学习笔记
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if note %}
+                <div class="existing-note mb-3">
+                    <p class="text-muted small">{{ note.content }}</p>
+                    <small class="text-muted">{{ note.date }}</small>
+                </div>
+                <hr>
+                {% endif %}
+                
+                <form onsubmit="addNote(event, {{ day }})">
+                    <div class="mb-3">
+                        <textarea class="form-control" id="noteContent" rows="4" 
+                                  placeholder="记录今天的学习心得、疑问或重点..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-circle me-2"></i>保存笔记
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 导航 -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-arrow-left-right me-2"></i>课程导航
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if day > 1 %}
+                    <a href="{{ url_for('course_day', day=day-1) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>上一天：第{{ day-1 }}天
+                    </a>
+                    {% endif %}
+                    
+                    {% if day < 90 %}
+                    <a href="{{ url_for('course_day', day=day+1) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-right me-2"></i>下一天：第{{ day+1 }}天
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('curriculum') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-list me-2"></i>返回课程大纲
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 学习进度 -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>学习统计
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <h6 class="text-muted">今日学习时间</h6>
+                    <p class="h5 text-primary">{{ content.duration }}</p>
+                </div>
+                
+                <div class="text-center">
+                    <small class="text-muted">建议每天坚持学习1-2小时</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card-header.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.code-container {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.code-header {
+    background: #e9ecef;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.code-container pre {
+    margin: 0;
+    padding: 1rem;
+    background: transparent;
+    border: none;
+}
+
+.code-container code {
+    background: transparent;
+    padding: 0;
+}
+
+.explanation-box {
+    background: #f8f9fa;
+    border-left: 4px solid #28a745;
+    padding: 1rem;
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.hint-box {
+    background: #e7f3ff;
+    border-left: 4px solid #007bff;
+    padding: 1rem;
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.solution-box {
+    background: #f8f9fa;
+    border: 1px solid #28a745;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.concept-item:last-child {
+    margin-bottom: 0 !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function completeDay(day) {
+    fetch(`/api/complete_day/${day}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('操作失败，请重试');
+    });
+}
+
+function addNote(event, day) {
+    event.preventDefault();
+    
+    const content = document.getElementById('noteContent').value.trim();
+    if (!content) {
+        alert('请输入笔记内容');
+        return;
+    }
+    
+    fetch('/api/add_note', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            day: day,
+            content: content
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('保存失败，请重试');
+    });
+}
+
+function toggleSolution(index) {
+    const solution = document.getElementById(`solution-${index}`);
+    const button = event.target;
+    
+    if (solution.style.display === 'none') {
+        solution.style.display = 'block';
+        button.innerHTML = '<i class="bi bi-eye-slash me-1"></i>隐藏答案';
+        button.classList.remove('btn-outline-success');
+        button.classList.add('btn-outline-danger');
+    } else {
+        solution.style.display = 'none';
+        button.innerHTML = '<i class="bi bi-eye me-1"></i>查看答案';
+        button.classList.remove('btn-outline-danger');
+        button.classList.add('btn-outline-success');
+    }
+}
+
+function copyCode(button) {
+    const codeBlock = button.closest('.code-container').querySelector('code');
+    const text = codeBlock.textContent;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="bi bi-check me-1"></i>已复制';
+        button.classList.add('btn-success');
+        
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-success');
+        }, 2000);
+    });
+}
+</script>
+{% endblock %} 

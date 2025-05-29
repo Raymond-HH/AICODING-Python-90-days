@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}课程大纲 - Python 90天学习系统{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-6 fw-bold text-primary mb-2">📚 课程大纲</h1>
+        <p class="text-muted">90天系统化Python学习计划，循序渐进掌握编程技能</p>
+    </div>
+    <div>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+            <i class="bi bi-house me-2"></i>返回首页
+        </a>
+    </div>
+</div>
+
+<!-- 学习进度概览 -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="bi bi-graph-up me-2"></i>整体学习进度
+                </h5>
+                <div class="row g-4">
+                    {% for level in course_structure %}
+                    <div class="col-md-4">
+                        <div class="progress-card text-center">
+                            <h6 class="fw-bold mb-2">{{ level.name }}阶段</h6>
+                            <p class="small text-muted mb-3">第{{ level.start_day }}-{{ level.end_day }}天</p>
+                            
+                            {% set level_completed = 0 %}
+                            {% for week in level.weeks %}
+                                {% for day in week.days %}
+                                    {% if day.completed %}
+                                        {% set level_completed = level_completed + 1 %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            {% set level_total = 30 %}
+                            {% set level_progress = (level_completed / level_total * 100) | round %}
+                            
+                            <div class="progress mb-2" style="height: 8px;">
+                                <div class="progress-bar 
+                                    {{ 'bg-primary' if level.name == '初级' else 'bg-success' if level.name == '中级' else 'bg-warning' }}" 
+                                    style="width: {{ level_progress }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ level_completed }}/{{ level_total }}天 ({{ level_progress }}%)</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 详细课程结构 -->
+{% for level in course_structure %}
+<div class="level-section mb-5">
+    <div class="level-header mb-4">
+        <div class="d-flex align-items-center">
+            <div class="level-icon me-3">
+                {% if level.name == '初级' %}
+                    <i class="bi bi-play-circle text-primary"></i>
+                {% elif level.name == '中级' %}
+                    <i class="bi bi-gear text-success"></i>
+                {% else %}
+                    <i class="bi bi-rocket text-warning"></i>
+                {% endif %}
+            </div>
+            <div>
+                <h2 class="h3 fw-bold mb-1">{{ level.name }}阶段</h2>
+                <p class="text-muted mb-0">第{{ level.start_day }}-{{ level.end_day }}天 · 共4周课程</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        {% for week in level.weeks %}
+        <div class="col-lg-6">
+            <div class="week-card card border-0 shadow-sm h-100">
+                <div class="card-header bg-light border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-calendar-week me-2"></i>第{{ week.number }}周
+                        </h5>
+                        <span class="badge bg-secondary">第{{ week.start_day }}-{{ week.end_day }}天</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="week-progress mb-3">
+                        {% set week_completed = 0 %}
+                        {% for day in week.days %}
+                            {% if day.completed %}
+                                {% set week_completed = week_completed + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                        {% set week_total = week.days | length %}
+                        {% set week_progress = (week_completed / week_total * 100) | round if week_total > 0 else 0 %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">进度</small>
+                            <small class="text-muted">{{ week_completed }}/{{ week_total }}天</small>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-info" style="width: {{ week_progress }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="days-grid">
+                        {% for day in week.days %}
+                        <div class="day-item mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="day-status me-3">
+                                    {% if day.completed %}
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                    {% elif day.current %}
+                                        <i class="bi bi-play-circle-fill text-primary"></i>
+                                    {% elif day.available %}
+                                        <i class="bi bi-circle text-muted"></i>
+                                    {% else %}
+                                        <i class="bi bi-lock-fill text-muted"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    {% if day.available %}
+                                    <a href="{{ url_for('course_day', day=day.number) }}" 
+                                       class="text-decoration-none 
+                                       {{ 'text-success fw-bold' if day.completed else 'text-primary fw-bold' if day.current else 'text-dark' }}">
+                                        第{{ day.number }}天: {{ day.topic }}
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">第{{ day.number }}天: {{ day.topic }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if day.completed %}
+                                <span class="badge bg-success ms-2">完成</span>
+                                {% elif day.current %}
+                                <span class="badge bg-primary ms-2">当前</span>
+                                {% elif not day.available %}
+                                <span class="badge bg-secondary ms-2">锁定</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+
+<!-- 学习建议 -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="bi bi-lightbulb me-2"></i>学习建议
+                </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-2">📅 学习安排</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2">
+                                <i class="bi bi-clock me-2"></i>
+                                每天坚持学习1-2小时，保持连续性
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-calendar-check me-2"></i>
+                                每周有6天学习+1天复习的节奏
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-trophy me-2"></i>
+                                完成每周项目，巩固所学知识
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-2">💡 学习方法</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2">
+                                <i class="bi bi-code-square me-2"></i>
+                                理论与实践相结合，多写代码
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-journal-text me-2"></i>
+                                做好学习笔记，记录重点和疑问
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-people me-2"></i>
+                                遇到问题主动思考，善于寻求帮助
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.level-icon {
+    font-size: 2.5rem;
+}
+
+.week-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.week-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.day-item {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s ease;
+}
+
+.day-item:hover {
+    background-color: #f8f9fa;
+}
+
+.day-status {
+    width: 24px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.progress-card {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.level-section {
+    position: relative;
+}
+
+.level-section::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, 
+        #007bff 0%, 
+        #28a745 33%, 
+        #ffc107 66%, 
+        #dc3545 100%);
+    border-radius: 2px;
+}
+
+.level-section:nth-child(1)::before {
+    background: #007bff;
+}
+
+.level-section:nth-child(2)::before {
+    background: #28a745;
+}
+
+.level-section:nth-child(3)::before {
+    background: #ffc107;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 添加一些交互效果
+document.addEventListener('DOMContentLoaded', function() {
+    // 为可用的天数添加点击提示
+    const dayItems = document.querySelectorAll('.day-item');
+    dayItems.forEach(item => {
+        const link = item.querySelector('a');
+        if (link) {
+            item.addEventListener('click', function(e) {
+                if (e.target !== link) {
+                    link.click();
+                }
+            });
+            item.style.cursor = 'pointer';
+        }
+    });
+    
+    // 添加进度动画
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+            bar.style.transition = 'width 1s ease-in-out';
+        }, 100);
+    });
+});
+</script>
+{% endblock %} 

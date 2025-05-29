@@ -1,0 +1,341 @@
+{
+  "metadata": {
+    "title": "Python 90天学习计划",
+    "description": "从零基础到能够独立开发项目的完整学习路径",
+    "duration": "90天",
+    "daily_time": "1-2小时",
+    "levels": [
+      "初级(1-30天)",
+      "中级(31-60天)",
+      "高级(61-90天)"
+    ]
+  },
+  "beginner": {
+    "title": "初级阶段 (第1-30天)",
+    "description": "掌握Python基础语法和核心概念",
+    "goals": [
+      "理解Python基本语法",
+      "掌握数据类型和控制结构",
+      "能够编写简单的程序",
+      "具备基础的调试能力"
+    ],
+    "days": {
+      "1": {
+        "topic": "Python简介与环境搭建",
+        "duration": "1-1.5小时",
+        "objectives": "了解Python语言特点，完成开发环境搭建",
+        "content": [
+          "Python语言简介：历史、特点、应用领域",
+          "Python版本说明（Python 2 vs Python 3）",
+          "安装Python解释器（官网下载、安装步骤）",
+          "选择和安装IDE（推荐VSCode、PyCharm）",
+          "第一个Python程序：Hello World",
+          "Python交互式环境（REPL）的使用",
+          "Python脚本文件的创建和运行"
+        ],
+        "examples": [
+          "print('Hello, World!')",
+          "print('你好，Python！')",
+          "# 这是注释",
+          "help() # 获取帮助",
+          "exit() # 退出交互环境"
+        ],
+        "exercises": [
+          "输出你的姓名和年龄",
+          "计算并输出圆形面积（半径为5）",
+          "尝试不同的print()参数",
+          "练习使用Python交互环境进行简单计算"
+        ],
+        "resources": [
+          "Python官网：https://www.python.org",
+          "VSCode下载：https://code.visualstudio.com"
+        ]
+      },
+      "2": {
+        "topic": "变量与数据类型",
+        "duration": "1.5小时",
+        "objectives": "掌握Python基本数据类型和变量使用",
+        "content": [
+          "变量的概念和作用",
+          "变量命名规则和最佳实践",
+          "数字类型：整数(int)、浮点数(float)、复数(complex)",
+          "字符串类型(str)：定义、基本操作",
+          "布尔类型(bool)：True和False",
+          "type()函数：检查变量类型",
+          "基本类型转换：int(), float(), str(), bool()"
+        ],
+        "examples": [
+          "name = 'Alice'  # 字符串变量",
+          "age = 25        # 整数变量",
+          "height = 1.75   # 浮点数变量",
+          "is_student = True  # 布尔变量",
+          "print(type(name))  # <class 'str'>",
+          "str_age = str(age)  # 类型转换"
+        ],
+        "exercises": [
+          "创建包含你个人信息的各种类型变量",
+          "使用type()检查每个变量的类型",
+          "练习不同数据类型之间的转换",
+          "尝试变量重新赋值"
+        ]
+      },
+      "3": {
+        "topic": "运算符与表达式",
+        "duration": "1.5小时",
+        "objectives": "掌握Python中各种运算符的使用",
+        "content": [
+          "算术运算符：+、-、*、/、//、%、**",
+          "比较运算符：==、!=、>、<、>=、<=",
+          "逻辑运算符：and、or、not",
+          "赋值运算符：=、+=、-=、*=、/=",
+          "成员运算符：in、not in",
+          "运算符优先级",
+          "表达式的计算顺序"
+        ],
+        "examples": [
+          "a = 10; b = 3",
+          "print(a + b)    # 加法：13",
+          "print(a // b)   # 整除：3",
+          "print(a % b)    # 取余：1",
+          "print(a ** b)   # 幂运算：1000",
+          "print(a > b and b > 0)  # 逻辑运算：True"
+        ],
+        "exercises": [
+          "编写程序计算矩形面积和周长",
+          "判断一个数是否为偶数",
+          "计算复合利息",
+          "练习不同运算符的组合使用"
+        ]
+      },
+      "4": {
+        "topic": "字符串处理基础",
+        "duration": "1.5小时",
+        "objectives": "掌握字符串的基本操作和格式化",
+        "content": [
+          "字符串的创建：单引号、双引号、三引号",
+          "字符串拼接：+ 操作符",
+          "字符串重复：* 操作符",
+          "字符串索引和切片",
+          "字符串长度：len()函数",
+          "字符串格式化：%格式化、.format()、f-string",
+          "常用字符串方法：upper()、lower()、strip()、replace()"
+        ],
+        "examples": [
+          "name = 'Python'",
+          "print(name[0])     # 'P'",
+          "print(name[1:4])   # 'yth'",
+          "print(len(name))   # 6",
+          "age = 25",
+          "print(f'我今年{age}岁')  # f-string格式化"
+        ],
+        "exercises": [
+          "从用户输入的姓名中提取姓氏",
+          "将句子中的单词首字母大写",
+          "统计字符串中某个字符的出现次数",
+          "练习不同的字符串格式化方法"
+        ]
+      },
+      "5": {
+        "topic": "用户输入与输出",
+        "duration": "1.5小时",
+        "objectives": "掌握程序与用户的交互方式",
+        "content": [
+          "input()函数：获取用户输入",
+          "input()返回值的类型（总是字符串）",
+          "输入数据的类型转换",
+          "print()函数的高级用法",
+          "print()的参数：sep、end、file",
+          "格式化输出的各种方法",
+          "处理用户输入的常见问题"
+        ],
+        "examples": [
+          "name = input('请输入您的姓名：')",
+          "age = int(input('请输入您的年龄：'))",
+          "print('姓名：', name, '年龄：', age)",
+          "print(name, age, sep=' - ', end='!\\n')",
+          "print(f'{name}今年{age}岁了')"
+        ],
+        "exercises": [
+          "编写程序询问用户信息并格式化输出",
+          "制作简单的单位转换器（如温度转换）",
+          "创建个人信息收集程序",
+          "练习不同的输出格式"
+        ]
+      },
+      "6": {
+        "topic": "条件语句",
+        "duration": "1.5小时",
+        "objectives": "掌握程序的条件控制结构",
+        "content": [
+          "if语句的基本语法",
+          "if-else语句",
+          "if-elif-else语句",
+          "条件表达式的写法",
+          "嵌套if语句",
+          "条件运算符（三元运算符）",
+          "常见的条件判断场景"
+        ],
+        "examples": [
+          "age = int(input('年龄：'))",
+          "if age >= 18:",
+          "    print('成年人')",
+          "elif age >= 13:",
+          "    print('青少年')",
+          "else:",
+          "    print('儿童')",
+          "# 三元运算符",
+          "status = '成年' if age >= 18 else '未成年'"
+        ],
+        "exercises": [
+          "编写成绩等级判断程序（A/B/C/D/E）",
+          "制作简单的登录验证系统",
+          "创建数字比较程序",
+          "实现简单的计算器选择功能"
+        ]
+      },
+      "7": {
+        "topic": "第一周复习与综合练习",
+        "duration": "2小时",
+        "objectives": "巩固第一周学习内容，查漏补缺",
+        "content": [
+          "回顾Python基础语法要点",
+          "练习变量和数据类型的使用",
+          "复习运算符和表达式",
+          "强化字符串处理技能",
+          "巩固条件语句的应用",
+          "解决常见编程错误",
+          "完成综合练习项目"
+        ],
+        "examples": [
+          "# 综合示例：个人信息管理程序",
+          "name = input('姓名：')",
+          "age = int(input('年龄：'))",
+          "if age >= 18:",
+          "    status = '成年人'",
+          "else:",
+          "    status = '未成年人'",
+          "print(f'{name}是{status}，今年{age}岁')"
+        ],
+        "exercises": [
+          "完成个人信息管理小程序",
+          "解决10道基础语法练习题",
+          "编写简单的数学计算器",
+          "总结第一周学习笔记",
+          "准备第一周项目：计算器程序"
+        ]
+      },
+      "8": {
+        "topic": "列表基础",
+        "duration": "1.5小时",
+        "objectives": "掌握列表的创建和基本操作",
+        "content": [
+          "列表的概念和特点",
+          "列表的创建方法",
+          "列表元素的访问：索引和切片",
+          "列表的基本操作：添加、删除、修改",
+          "列表方法：append()、insert()、remove()、pop()",
+          "列表的合并和重复",
+          "列表的长度和成员检查"
+        ],
+        "examples": [
+          "fruits = ['苹果', '香蕉', '橙子']",
+          "print(fruits[0])  # '苹果'",
+          "fruits.append('葡萄')",
+          "fruits.insert(1, '草莓')",
+          "fruits.remove('香蕉')",
+          "print(len(fruits))"
+        ],
+        "exercises": [
+          "创建购物清单并进行增删改操作",
+          "实现学生名单管理",
+          "练习列表切片操作",
+          "编写简单的待办事项列表"
+        ]
+      }
+    }
+  },
+  "intermediate": {
+    "title": "中级阶段 (第31-60天)",
+    "description": "深入学习面向对象编程和常用库",
+    "goals": [
+      "掌握面向对象编程",
+      "熟练使用常用第三方库",
+      "能够处理文件和网络操作",
+      "具备基础的项目开发能力"
+    ],
+    "days": {
+      "31": {
+        "topic": "面向对象编程基础",
+        "duration": "2小时",
+        "objectives": "理解类和对象的概念，学会定义简单的类",
+        "content": [
+          "面向对象编程概念和优势",
+          "类和对象的关系",
+          "类的定义：class关键字",
+          "构造方法：__init__()",
+          "实例属性和方法",
+          "self参数的作用",
+          "对象的实例化",
+          "访问对象的属性和方法"
+        ],
+        "examples": [
+          "class Person:",
+          "    def __init__(self, name, age):",
+          "        self.name = name",
+          "        self.age = age",
+          "    def introduce(self):",
+          "        print(f'我是{self.name}，{self.age}岁')",
+          "person1 = Person('张三', 25)",
+          "person1.introduce()"
+        ],
+        "exercises": [
+          "创建学生类，包含姓名、年龄、成绩属性",
+          "为学生类添加显示信息的方法",
+          "创建多个学生对象并调用方法",
+          "实现简单的银行账户类"
+        ]
+      }
+    }
+  },
+  "advanced": {
+    "title": "高级阶段 (第61-90天)",
+    "description": "学习高级特性和实际项目开发",
+    "goals": [
+      "掌握高级编程技巧",
+      "能够开发完整的应用程序",
+      "了解性能优化和部署",
+      "具备解决复杂问题的能力"
+    ],
+    "days": {
+      "61": {
+        "topic": "设计模式入门",
+        "duration": "2小时",
+        "objectives": "了解常用设计模式，提高代码质量",
+        "content": [
+          "设计模式概述和分类",
+          "单例模式：确保类只有一个实例",
+          "工厂模式：创建对象的统一接口",
+          "观察者模式：对象间的一对多依赖关系",
+          "装饰器模式：动态添加功能",
+          "策略模式：算法的封装和切换",
+          "设计模式的实际应用场景"
+        ],
+        "examples": [
+          "# 单例模式示例",
+          "class Singleton:",
+          "    _instance = None",
+          "    def __new__(cls):",
+          "        if not cls._instance:",
+          "            cls._instance = super().__new__(cls)",
+          "        return cls._instance"
+        ],
+        "exercises": [
+          "实现配置管理单例类",
+          "设计简单的图形工厂",
+          "创建事件监听系统",
+          "应用装饰器模式扩展功能"
+        ]
+      }
+    }
+  }
+}

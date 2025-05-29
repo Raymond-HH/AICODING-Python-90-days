@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}系统设置 - Python 90天学习系统{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-6 fw-bold text-primary mb-2">⚙️ 系统设置</h1>
+        <p class="text-muted">管理您的学习数据和系统配置</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-person-gear me-2"></i>学习进度管理
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="fw-bold">当前进度信息</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>开始日期：</strong> {{ progress.start_date }}</li>
+                        <li><strong>当前学习天：</strong> 第{{ progress.current_day }}天</li>
+                        <li><strong>已完成天数：</strong> {{ progress.completed_days|length }}天</li>
+                        <li><strong>学习笔记：</strong> {{ progress.notes|length }}条</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>注意：</strong>重置进度将删除所有学习记录，此操作不可恢复！
+                </div>
+                
+                <button class="btn btn-danger" onclick="resetProgress()">
+                    <i class="bi bi-arrow-clockwise me-2"></i>重置学习进度
+                </button>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-download me-2"></i>数据备份与恢复
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">定期备份您的学习数据，避免意外丢失。</p>
+                
+                <div class="d-flex gap-3">
+                    <button class="btn btn-outline-primary" onclick="backupData()">
+                        <i class="bi bi-cloud-download me-2"></i>备份数据
+                    </button>
+                    <button class="btn btn-outline-success" onclick="exportProgress()">
+                        <i class="bi bi-file-earmark-text me-2"></i>导出进度报告
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-light border-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>系统信息
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li class="mb-2">
+                        <strong>版本：</strong> 2.0.0
+                    </li>
+                    <li class="mb-2">
+                        <strong>框架：</strong> Flask + Bootstrap
+                    </li>
+                    <li class="mb-2">
+                        <strong>课程总数：</strong> 90天
+                    </li>
+                    <li class="mb-2">
+                        <strong>项目数量：</strong> 13个
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light border-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-question-circle me-2"></i>帮助与支持
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('about') }}" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-info me-1"></i>关于系统
+                    </a>
+                    <button class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-book me-1"></i>使用手册
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-envelope me-1"></i>联系支持
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 隐藏的数据元素，用于JavaScript访问 -->
+<script type="application/json" id="progress-data">{{ progress | tojson }}</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function resetProgress() {
+    if (confirm('确定要重置所有学习进度吗？此操作不可恢复！')) {
+        if (confirm('请再次确认：这将删除所有学习记录、笔记和进度！')) {
+            fetch('/api/reset_progress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.href = '/';
+                } else {
+                    alert('重置失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败，请重试');
+            });
+        }
+    }
+}
+
+function backupData() {
+    // 从隐藏元素获取数据
+    const progressElement = document.getElementById('progress-data');
+    const progressData = JSON.parse(progressElement.textContent);
+    
+    const dataStr = JSON.stringify(progressData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `python_learning_backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    alert('学习数据已备份到下载文件夹');
+}
+
+function exportProgress() {
+    // 从隐藏元素获取数据
+    const progressElement = document.getElementById('progress-data');
+    const progressData = JSON.parse(progressElement.textContent);
+    
+    const stats = {
+        startDate: progressData.start_date,
+        currentDay: progressData.current_day,
+        completedDays: progressData.completed_days.length,
+        totalNotes: Object.keys(progressData.notes).length,
+        completionRate: (progressData.completed_days.length / 90 * 100).toFixed(1)
+    };
+    
+    const reportContent = `
+Python 90天学习系统 - 进度报告
+生成时间：${new Date().toLocaleString()}
+
+学习统计：
+- 开始日期：${stats.startDate}
+- 当前学习天：${stats.currentDay}
+- 已完成天数：${stats.completedDays}/90天
+- 完成进度：${stats.completionRate}%
+- 学习笔记：${stats.totalNotes}条
+
+已完成的天数：
+${progressData.completed_days.join(', ')}
+
+学习建议：
+- 继续保持每日学习的好习惯
+- 及时复习已学内容，巩固知识点
+- 完成每周项目，提升实践能力
+- 多做练习，加深理解
+
+感谢您使用Python学习系统！
+    `;
+    
+    const reportBlob = new Blob([reportContent], {type: 'text/plain'});
+    const url = URL.createObjectURL(reportBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `python_learning_report_${new Date().toISOString().slice(0,10)}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    alert('学习报告已导出');
+}
+</script>
+{% endblock %} 
