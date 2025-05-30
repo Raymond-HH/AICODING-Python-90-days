@@ -64,11 +64,39 @@ class WebLearningSystem:
     
     def get_day_content(self, day):
         """获取指定天数的学习内容"""
+        # 首先尝试从详细课程内容获取
         try:
-            # 首先尝试从完整课程数据库获取
+            from detailed_course_content import get_detailed_course_content
+            detailed_content = get_detailed_course_content()
+            if str(day) in detailed_content:
+                content = detailed_content[str(day)]
+                # 如果没有拓展阅读，尝试添加
+                if 'extended_reading' not in content:
+                    content = self._add_extended_reading(content, day)
+                return content
+        except Exception as e:
+            print(f"无法加载详细课程内容: {e}")
+        
+        # 尝试从第二部分详细课程内容获取
+        try:
+            from detailed_course_content_part2 import get_detailed_course_content_part2
+            detailed_content_part2 = get_detailed_course_content_part2()
+            if str(day) in detailed_content_part2:
+                content = detailed_content_part2[str(day)]
+                # 如果没有拓展阅读，尝试添加
+                if 'extended_reading' not in content:
+                    content = self._add_extended_reading(content, day)
+                return content
+        except Exception as e:
+            print(f"无法加载第二部分详细课程内容: {e}")
+        
+        # 尝试从完整课程数据库获取
+        try:
             complete_database = get_complete_course_database()
             if str(day) in complete_database:
-                return complete_database[str(day)]
+                content = complete_database[str(day)]
+                content = self._add_extended_reading(content, day)
+                return content
         except:
             pass
         
@@ -76,7 +104,9 @@ class WebLearningSystem:
         try:
             extended_content = get_extended_curriculum()
             if str(day) in extended_content:
-                return extended_content[str(day)]
+                content = extended_content[str(day)]
+                content = self._add_extended_reading(content, day)
+                return content
         except:
             pass
         
@@ -85,18 +115,66 @@ class WebLearningSystem:
             from simple_course_content import get_simple_course_content
             simple_content = get_simple_course_content()
             if str(day) in simple_content:
-                return simple_content[str(day)]
+                content = simple_content[str(day)]
+                content = self._add_extended_reading(content, day)
+                return content
         except:
             pass
+        
+        # 使用完整课程大纲作为后备
+        try:
+            from complete_curriculum import get_complete_curriculum
+            complete_curriculum = get_complete_curriculum()
+            if str(day) in complete_curriculum:
+                curriculum_data = complete_curriculum[str(day)]
+                # 构建基本的内容结构
+                content = {
+                    "topic": curriculum_data["topic"],
+                    "level": curriculum_data["level"],
+                    "duration": "1-2小时",
+                    "objectives": f"掌握{curriculum_data['topic']}的核心概念和实践应用",
+                    "concepts": [
+                        {
+                            "name": curriculum_data["topic"],
+                            "description": f"第{day}天的主要学习内容",
+                            "details": [
+                                "理论学习与概念理解",
+                                "实践练习与代码编写",
+                                "问题解决与调试技巧"
+                            ]
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": f"{curriculum_data['topic']}示例",
+                            "code": "# 第" + str(day) + "天：" + curriculum_data['topic'] + "\n# 示例代码将在课程中详细讲解\nprint('今天学习：" + curriculum_data['topic'] + "')",
+                            "explanation": "这是今天学习内容的示例代码"
+                        }
+                    ],
+                    "exercises": [
+                        {
+                            "title": "今日练习",
+                            "description": f"完成{curriculum_data['topic']}相关的练习题",
+                            "hint": "仔细阅读课程内容，动手实践",
+                            "solution": "# 解答将在课程中提供"
+                        }
+                    ]
+                }
+                content = self._add_extended_reading(content, day)
+                return content
+        except Exception as e:
+            print(f"无法加载完整课程大纲: {e}")
         
         # 从原始curriculum获取
         for level_data in self.curriculum.values():
             if isinstance(level_data, dict) and 'days' in level_data:
                 if str(day) in level_data['days']:
-                    return level_data['days'][str(day)]
+                    content = level_data['days'][str(day)]
+                    content = self._add_extended_reading(content, day)
+                    return content
         
         # 如果都没有，返回默认内容
-        return {
+        content = {
             "topic": f"第{day}天课程",
             "duration": "1-2小时", 
             "objectives": "学习Python编程技能",
@@ -123,6 +201,60 @@ class WebLearningSystem:
                 }
             ]
         }
+        content = self._add_extended_reading(content, day)
+        return content
+    
+    def _add_extended_reading(self, content, day):
+        """为课程内容添加拓展阅读"""
+        try:
+            from extended_reading_config import get_extended_reading_config
+            extended_config = get_extended_reading_config()
+            
+            if str(day) in extended_config:
+                content['extended_reading'] = extended_config[str(day)]
+            else:
+                # 提供默认的拓展阅读
+                content['extended_reading'] = {
+                    "title": "拓展阅读",
+                    "description": "官方文档和学习资源",
+                    "materials": [
+                        {
+                            "title": "Python官方教程",
+                            "url": "https://docs.python.org/zh-cn/3/tutorial/index.html",
+                            "description": "Python官方教程，权威的学习资源",
+                            "type": "official_doc"
+                        },
+                        {
+                            "title": "Python标准库",
+                            "url": "https://docs.python.org/zh-cn/3/library/index.html",
+                            "description": "Python标准库完整参考",
+                            "type": "official_doc"
+                        }
+                    ],
+                    "tips": [
+                        "多练习是学习编程的最佳方式",
+                        "善用官方文档查找详细信息",
+                        "加入Python社区，与其他开发者交流"
+                    ]
+                }
+        except Exception as e:
+            print(f"无法加载拓展阅读配置: {e}")
+            # 如果加载失败，提供基本的拓展阅读
+            content['extended_reading'] = {
+                "title": "拓展阅读",
+                "description": "推荐的学习资源",
+                "materials": [
+                    {
+                        "title": "Python官方文档",
+                        "url": "https://docs.python.org/zh-cn/3/",
+                        "description": "Python官方文档，最权威的参考资料",
+                        "type": "official_doc"
+                    }
+                ],
+                "tips": ["持续练习，多读官方文档"]
+            }
+        
+        return content
     
     def get_progress_stats(self):
         """获取学习进度统计"""
@@ -156,6 +288,23 @@ class WebLearningSystem:
             'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         self.save_progress()
+    
+    def update_note(self, day, content):
+        """更新学习笔记"""
+        if str(day) in self.progress['notes']:
+            self.progress['notes'][str(day)]['content'] = content
+            self.progress['notes'][str(day)]['date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self.save_progress()
+            return True
+        return False
+    
+    def delete_note(self, day):
+        """删除学习笔记"""
+        if str(day) in self.progress['notes']:
+            del self.progress['notes'][str(day)]
+            self.save_progress()
+            return True
+        return False
     
     def get_weekly_projects(self):
         """获取所有周项目信息"""
@@ -300,6 +449,34 @@ def api_add_note():
     
     learning_system.add_note(day, content)
     return jsonify({'success': True, 'message': '笔记已保存！'})
+
+@app.route('/api/update_note', methods=['POST'])
+def api_update_note():
+    """API: 更新笔记"""
+    data = request.json
+    day = data.get('day')
+    content = data.get('content', '').strip()
+    
+    if not content:
+        return jsonify({'success': False, 'message': '笔记内容不能为空'})
+    
+    success = learning_system.update_note(day, content)
+    if success:
+        return jsonify({'success': True, 'message': '笔记已更新！'})
+    else:
+        return jsonify({'success': False, 'message': '笔记不存在'})
+
+@app.route('/api/delete_note', methods=['POST'])
+def api_delete_note():
+    """API: 删除笔记"""
+    data = request.json
+    day = data.get('day')
+    
+    success = learning_system.delete_note(day)
+    if success:
+        return jsonify({'success': True, 'message': '笔记已删除！'})
+    else:
+        return jsonify({'success': False, 'message': '笔记不存在'})
 
 @app.route('/api/progress')
 def api_progress():

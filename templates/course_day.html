@@ -176,6 +176,81 @@
         </div>
         {% endif %}
 
+        <!-- 拓展阅读 -->
+        {% if content.extended_reading %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-book me-2"></i>{{ content.extended_reading.title }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">{{ content.extended_reading.description }}</p>
+                
+                {% if content.extended_reading.materials %}
+                <div class="mb-4">
+                    <h6 class="fw-bold text-info mb-3">
+                        <i class="bi bi-globe me-2"></i>推荐资源
+                    </h6>
+                    <div class="row g-3">
+                        {% for material in content.extended_reading.materials %}
+                        <div class="col-12">
+                            <div class="border rounded p-3 h-100 reading-material-card">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0 me-3">
+                                        {% if material.type == 'official_doc' %}
+                                            <span class="badge bg-primary">官方文档</span>
+                                        {% elif material.type == 'best_practice' %}
+                                            <span class="badge bg-success">最佳实践</span>
+                                        {% elif material.type == 'philosophy' %}
+                                            <span class="badge bg-warning text-dark">设计哲学</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">参考资料</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-2">
+                                            <a href="{{ material.url }}" target="_blank" 
+                                               class="text-decoration-none text-primary">
+                                                {{ material.title }}
+                                                <i class="bi bi-box-arrow-up-right ms-1 small"></i>
+                                            </a>
+                                        </h6>
+                                        <p class="small text-muted mb-0">{{ material.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if content.extended_reading.tips %}
+                <div class="learning-tips">
+                    <h6 class="fw-bold text-info mb-3">
+                        <i class="bi bi-lightbulb me-2"></i>学习建议
+                    </h6>
+                    <ul class="list-group list-group-flush">
+                        {% for tip in content.extended_reading.tips %}
+                        <li class="list-group-item border-0 py-2 px-0">
+                            <i class="bi bi-arrow-right text-info me-2"></i>{{ tip }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <div class="mt-4 text-center">
+                    <button class="btn btn-outline-info btn-sm" onclick="toggleExtendedReading()">
+                        <i class="bi bi-chevron-up me-1" id="extended-reading-icon"></i>
+                        <span id="extended-reading-text">收起拓展阅读</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- 学习资源 -->
         {% if content.resources %}
         <div class="card border-0 shadow-sm mb-4">
@@ -331,6 +406,29 @@
 .concept-item:last-child {
     margin-bottom: 0 !important;
 }
+
+.reading-material-card {
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.reading-material-card:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.learning-tips .list-group-item {
+    background: transparent;
+}
+
+.extended-reading-collapsed .card-body > *:not(:first-child):not(:last-child) {
+    display: none;
+}
+
+.badge {
+    font-size: 0.75em;
+}
 </style>
 {% endblock %}
 
@@ -421,6 +519,27 @@ function copyCode(button) {
             button.classList.remove('btn-success');
         }, 2000);
     });
+}
+
+function toggleExtendedReading() {
+    const extendedReadingCard = document.querySelector('.card:has(.extended-reading-content)');
+    const icon = document.getElementById('extended-reading-icon');
+    const text = document.getElementById('extended-reading-text');
+    const cardBody = extendedReadingCard ? extendedReadingCard.querySelector('.card-body') : null;
+    
+    if (!cardBody) return;
+    
+    if (cardBody.classList.contains('extended-reading-collapsed')) {
+        // 展开
+        cardBody.classList.remove('extended-reading-collapsed');
+        icon.className = 'bi bi-chevron-up me-1';
+        text.textContent = '收起拓展阅读';
+    } else {
+        // 收起
+        cardBody.classList.add('extended-reading-collapsed');
+        icon.className = 'bi bi-chevron-down me-1';
+        text.textContent = '展开拓展阅读';
+    }
 }
 </script>
 {% endblock %} 

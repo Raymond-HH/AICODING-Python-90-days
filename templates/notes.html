@@ -8,26 +8,60 @@
         <h1 class="display-6 fw-bold text-primary mb-2">📝 学习笔记</h1>
         <p class="text-muted">记录您的学习心得和重要知识点</p>
     </div>
+    <div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+            <i class="bi bi-plus-circle me-2"></i>添加笔记
+        </button>
+    </div>
 </div>
 
 {% if notes %}
 <div class="row">
     {% for day, note in notes.items() %}
     <div class="col-lg-6 mb-4">
-        <div class="card border-0 shadow-sm h-100">
+        <div class="card border-0 shadow-sm h-100 note-card" data-day="{{ day }}">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h6 class="card-title mb-0">
                     <i class="bi bi-calendar-day me-2"></i>第{{ day }}天
                 </h6>
-                <small class="text-muted">{{ note.date }}</small>
+                <div class="d-flex align-items-center gap-2">
+                    <small class="text-muted">{{ note.date }}</small>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item edit-note" href="#" data-day="{{ day }}" data-content="{{ note.content }}">
+                                    <i class="bi bi-pencil me-2"></i>编辑
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger delete-note" href="#" data-day="{{ day }}">
+                                    <i class="bi bi-trash me-2"></i>删除
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
-                <p class="card-text">{{ note.content }}</p>
+                <p class="card-text note-content">{{ note.content }}</p>
             </div>
             <div class="card-footer bg-white border-0">
-                <a href="{{ url_for('course_day', day=day) }}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-book me-1"></i>查看课程
-                </a>
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('course_day', day=day) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-book me-1"></i>查看课程
+                    </a>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary edit-note" data-day="{{ day }}" data-content="{{ note.content }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger delete-note" data-day="{{ day }}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -38,9 +72,302 @@
     <i class="bi bi-journal-x text-muted" style="font-size: 4rem;"></i>
     <h4 class="text-muted mt-3">还没有学习笔记</h4>
     <p class="text-muted">开始学习并记录您的心得吧！</p>
-    <a href="{{ url_for('curriculum') }}" class="btn btn-primary">
-        <i class="bi bi-book me-2"></i>开始学习
-    </a>
+    <div class="d-flex gap-3 justify-content-center">
+        <a href="{{ url_for('curriculum') }}" class="btn btn-primary">
+            <i class="bi bi-book me-2"></i>开始学习
+        </a>
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+            <i class="bi bi-plus-circle me-2"></i>添加笔记
+        </button>
+    </div>
 </div>
 {% endif %}
+
+<!-- 添加笔记模态框 -->
+<div class="modal fade" id="addNoteModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>添加学习笔记
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addNoteForm">
+                    <div class="mb-3">
+                        <label for="noteDay" class="form-label">学习天数</label>
+                        <select class="form-select" id="noteDay" required>
+                            <option value="">选择学习天数</option>
+                            {% for i in range(1, 91) %}
+                            <option value="{{ i }}">第{{ i }}天</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="noteContent" class="form-label">笔记内容</label>
+                        <textarea class="form-control" id="noteContent" rows="6" placeholder="记录今天的学习心得、重点知识或疑问..." required></textarea>
+                        <div class="form-text">支持换行，建议记录重点概念、代码示例或学习感悟</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveNoteBtn">
+                    <i class="bi bi-check-circle me-2"></i>保存笔记
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑笔记模态框 -->
+<div class="modal fade" id="editNoteModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil me-2"></i>编辑学习笔记
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editNoteForm">
+                    <div class="mb-3">
+                        <label for="editNoteDay" class="form-label">学习天数</label>
+                        <input type="text" class="form-control" id="editNoteDay" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editNoteContent" class="form-label">笔记内容</label>
+                        <textarea class="form-control" id="editNoteContent" rows="6" required></textarea>
+                        <div class="form-text">修改您的学习笔记内容</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="updateNoteBtn">
+                    <i class="bi bi-check-circle me-2"></i>更新笔记
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态框 -->
+<div class="modal fade" id="deleteNoteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>确认删除
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除第 <span id="deleteNoteDay"></span> 天的学习笔记吗？</p>
+                <p class="text-muted small">此操作不可撤销，请谨慎操作。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="bi bi-trash me-2"></i>确认删除
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.note-card {
+    transition: all 0.3s ease;
+}
+
+.note-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.note-content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.6;
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+.modal-lg {
+    max-width: 800px;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.125);
+}
+
+.note-card .card-footer {
+    border-top: 1px solid rgba(0,0,0,0.125);
+}
+
+@media (max-width: 768px) {
+    .btn-group {
+        display: none;
+    }
+    
+    .dropdown {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .dropdown {
+        display: none;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentEditDay = null;
+    let currentDeleteDay = null;
+
+    // 添加笔记
+    document.getElementById('saveNoteBtn').addEventListener('click', function() {
+        const day = document.getElementById('noteDay').value;
+        const content = document.getElementById('noteContent').value.trim();
+
+        if (!day || !content) {
+            alert('请填写完整的笔记信息');
+            return;
+        }
+
+        fetch('/api/add_note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                day: day,
+                content: content
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('保存失败：' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('保存失败，请重试');
+        });
+    });
+
+    // 编辑笔记
+    document.querySelectorAll('.edit-note').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentEditDay = this.dataset.day;
+            const content = this.dataset.content;
+
+            document.getElementById('editNoteDay').value = `第${currentEditDay}天`;
+            document.getElementById('editNoteContent').value = content;
+
+            const editModal = new bootstrap.Modal(document.getElementById('editNoteModal'));
+            editModal.show();
+        });
+    });
+
+    // 更新笔记
+    document.getElementById('updateNoteBtn').addEventListener('click', function() {
+        const content = document.getElementById('editNoteContent').value.trim();
+
+        if (!content) {
+            alert('笔记内容不能为空');
+            return;
+        }
+
+        fetch('/api/update_note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                day: currentEditDay,
+                content: content
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('更新失败：' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('更新失败，请重试');
+        });
+    });
+
+    // 删除笔记
+    document.querySelectorAll('.delete-note').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentDeleteDay = this.dataset.day;
+            document.getElementById('deleteNoteDay').textContent = currentDeleteDay;
+
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteNoteModal'));
+            deleteModal.show();
+        });
+    });
+
+    // 确认删除
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        fetch('/api/delete_note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                day: currentDeleteDay
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('删除失败：' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('删除失败，请重试');
+        });
+    });
+
+    // 清空表单当模态框关闭时
+    document.getElementById('addNoteModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('addNoteForm').reset();
+    });
+});
+</script>
 {% endblock %} 

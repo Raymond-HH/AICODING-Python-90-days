@@ -30,23 +30,23 @@
                             <h6 class="fw-bold mb-2">{{ level.name }}阶段</h6>
                             <p class="small text-muted mb-3">第{{ level.start_day }}-{{ level.end_day }}天</p>
                             
-                            {% set level_completed = 0 %}
+                            {% set ns = namespace(level_completed=0) %}
                             {% for week in level.weeks %}
                                 {% for day in week.days %}
                                     {% if day.completed %}
-                                        {% set level_completed = level_completed + 1 %}
+                                        {% set ns.level_completed = ns.level_completed + 1 %}
                                     {% endif %}
                                 {% endfor %}
                             {% endfor %}
                             {% set level_total = 30 %}
-                            {% set level_progress = (level_completed / level_total * 100) | round %}
+                            {% set level_progress = (ns.level_completed / level_total * 100) | round %}
                             
                             <div class="progress mb-2" style="height: 8px;">
                                 <div class="progress-bar 
                                     {{ 'bg-primary' if level.name == '初级' else 'bg-success' if level.name == '中级' else 'bg-warning' }}" 
                                     style="width: {{ level_progress }}%"></div>
                             </div>
-                            <small class="text-muted">{{ level_completed }}/{{ level_total }}天 ({{ level_progress }}%)</small>
+                            <small class="text-muted">{{ ns.level_completed }}/{{ level_total }}天 ({{ level_progress }}%)</small>
                         </div>
                     </div>
                     {% endfor %}
@@ -91,18 +91,18 @@
                 </div>
                 <div class="card-body">
                     <div class="week-progress mb-3">
-                        {% set week_completed = 0 %}
+                        {% set ns_week = namespace(week_completed=0) %}
                         {% for day in week.days %}
                             {% if day.completed %}
-                                {% set week_completed = week_completed + 1 %}
+                                {% set ns_week.week_completed = ns_week.week_completed + 1 %}
                             {% endif %}
                         {% endfor %}
                         {% set week_total = week.days | length %}
-                        {% set week_progress = (week_completed / week_total * 100) | round if week_total > 0 else 0 %}
+                        {% set week_progress = (ns_week.week_completed / week_total * 100) | round if week_total > 0 else 0 %}
                         
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <small class="text-muted">进度</small>
-                            <small class="text-muted">{{ week_completed }}/{{ week_total }}天</small>
+                            <small class="text-muted">{{ ns_week.week_completed }}/{{ week_total }}天</small>
                         </div>
                         <div class="progress" style="height: 6px;">
                             <div class="progress-bar bg-info" style="width: {{ week_progress }}%"></div>

@@ -1,14 +1,21 @@
 {
   "start_date": "2025-05-29",
-  "current_day": 3,
+  "current_day": 6,
   "completed_days": [
     1,
-    2
+    2,
+    3,
+    4,
+    5
   ],
   "notes": {
     "1": {
-      "content": "1",
-      "date": "2025-05-29 23:22:36"
+      "content": "更新后的笔记内容：今天学习了Python基础语法，包括变量、数据类型和基本运算符。sdsada",
+      "date": "2025-05-30 11:15:51"
+    },
+    "3": {
+      "content": "nnn",
+      "date": "2025-05-30 08:43:55"
     }
   },
   "weekly_projects": {}
